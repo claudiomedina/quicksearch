@@ -1,4 +1,19 @@
 (function($, window, document, undefined) {
+
+	var stripAccents = (function () {
+		var in_chrs	 = 'àáâãäçèéêëìíîïñòóôõöùúûüýÿ',
+				out_chrs	= 'aaaaaceeeeiiiinooooouuuuyy', 
+				chars_rgx = new RegExp('[' + in_chrs + ']', 'g'),
+				transl		= {}, i,
+				lookup		= function (m) { return transl[m] || m; };
+	
+		for (i=0; i<in_chrs.length; i++) {
+			transl[ in_chrs[i] ] = out_chrs[i];
+		}
+	
+		return function (s) { return s.replace(chars_rgx, lookup); }
+	})();
+
 	$.fn.quicksearch = function (target, opt) {
 		
 		var timeout, cache, rowcache, jq_results, val = '', e = this, options = $.extend({ 
@@ -22,7 +37,7 @@
 				this.style.display = "none";
 			},
 			prepareQuery: function (val) {
-				return val.toLowerCase().split(' ');
+				return stripAccents(val.toLowerCase()).split(' ');
 			},
 			testQuery: function (query, txt, _row) {
 				for (var i = 0; i < query.length; i += 1) {
@@ -99,7 +114,7 @@
 		
 		this.strip_html = function (input) {
 			var output = input.replace(new RegExp('<[^<]+\>', 'g'), "");
-			output = $.trim(output.toLowerCase());
+			output = stripAccents($.trim(output.toLowerCase()));
 			return output;
 		};
 		
